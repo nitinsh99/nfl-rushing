@@ -9,8 +9,8 @@ module.exports = {
     path: '/api/v1/players',
     handler: function (request, h) {
 
-        const { page, sort, search } = request.query;
-        const sortedPlayers = getSortedPlayers({ sort });
+        const { page, sort, search, sortOrder } = request.query;
+        const sortedPlayers = getSortedPlayers({ sort, sortOrder });
         const filteredPlayers = getFilteredPlayers({ search, sortedPlayers });
         const players = getPaginatedPlayers({ filteredPlayers, page });
 

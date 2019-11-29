@@ -6,7 +6,7 @@ import React from 'react';
 import { Table, Pagination, Button } from 'antd';
 
 import Player from '../table-config/columns';
-import { addSorterToColumns, addSearchToColumn, getURL } from '../utils';
+import { addSorterToColumns, addSearchToColumn, getNewSortOrder, getURL } from '../utils';
 import { CONSTANTS } from '../constant';
 
 const { BASE_PORT, BASE_URL, DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_TOTAL, PROTOCOL } = CONSTANTS;
@@ -25,6 +25,11 @@ class RushTableScreen extends React.Component {
         page: DEFAULT_PAGE,
         pageSize: DEFAULT_PAGE_SIZE,
         total: DEFAULT_TOTAL
+      },
+      sortOrder: {
+        yrds: 'asc',
+        lng: 'asc',
+        td: 'asc'
       },
       sort: null,
       searchInput: null,
@@ -48,9 +53,8 @@ class RushTableScreen extends React.Component {
     return {
       onClick: async () => {
         try {
-          await this.setState({
-            sort: column.dataIndex
-          })
+          const newSortOrder = getNewSortOrder(column, this.state.sortOrder)
+          await this.setState(newSortOrder);
           await this.fetchPlayerList()
         }
         catch (error) {
@@ -105,7 +109,7 @@ class RushTableScreen extends React.Component {
   handleCSVDownload = async () => {
 
     try {
-      const url = getURL(null, this.state.sort, this.state.searchInput)
+      const url = getURL(null, this.state.sort, this.state.searchInput, this.state.sortOrder)
       const { data } = await axiosInstance.get(url)
       const fields = ["Player", "Team", "Pos", "Att", "Att/G", "Yds", "Avg", "Yds/G", "TD", "Lng", "1st", "1st%", "20+", "40+", "FUM"]
       const opts = { fields };
@@ -125,7 +129,7 @@ class RushTableScreen extends React.Component {
    */
   fetchPlayerList = async () => {
     try {
-      const url = getURL(this.state.pagination.page, this.state.sort, this.state.searchInput)
+      const url = getURL(this.state.pagination.page, this.state.sort, this.state.searchInput, this.state.sortOrder);
       const { data } = await axiosInstance.get(url)
       await this.setState({
         players: data.players,
@@ -141,9 +145,9 @@ class RushTableScreen extends React.Component {
     const { columns, players, pagination, csvData } = this.state;
     const { page, total } = pagination;
     return (
-      <div style={{margin: '10px'}}>
+      <div style={{ margin: '10px' }}>
         <Table dataSource={players} columns={columns} pagination={false} />
-        <div style={{display: 'flex', justifyContent: 'space-between', margin: '10px'}}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', margin: '10px' }}>
           <Pagination onChange={this.handlePageChange} total={total} defaultCurrent={page} current={page} />
           <Button onClick={this.handleCSVDownload}>Export CSV</Button>
           <CSVLink

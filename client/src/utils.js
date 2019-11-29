@@ -56,6 +56,18 @@ export const addSearchToColumn = (columns = [], columnNames = [], _this) => {
 
 }
 
+const _getsortOrder = (sort, sortOrder) => {
+    switch (sort) {
+        case 'Yds':
+            return sortOrder.yrds;
+        case 'Lng':
+            return sortOrder.lng;
+        case 'TD':
+            return sortOrder.td;
+        default:
+            return 'asc'
+    }
+}
 
 /**
  * 
@@ -65,12 +77,52 @@ export const addSearchToColumn = (columns = [], columnNames = [], _this) => {
  * 
  * @returns url : FQDN of the get players api
  */
-export const getURL = (page, sort, search) => {
+export const getURL = (page, sort, search, sortOrder) => {
+
+    const _sortOrder = _getsortOrder(sort, sortOrder);
     const queryParams = {
         ...(page && { page }),
         ...(sort && { sort }),
-        ...(search && { search })
+        ...(search && { search }),
+        ...(_sortOrder && { sortOrder: _sortOrder })
     };
     const url = `${PLAYER_API_PATH}${stringify(queryParams, { addQueryPrefix: true, encode: false })}`;
     return url;
+}
+
+
+/**
+ * 
+ * @param {*} column  Name of the column being used for sorting
+ * @param {*} sortOrder Existing sort order (asc or desc) of this column
+ */
+export const getNewSortOrder = (column, sortOrder) => {
+
+    let newSortOrder;
+    switch (column.dataIndex) {
+        case 'Yds':
+            newSortOrder = (sortOrder.yrds === 'asc') ? 'desc' : 'asc';
+            return {
+                sort: column.dataIndex,
+                sortOrder: {
+                    yrds: newSortOrder
+                }
+            }
+        case 'Lng':
+            newSortOrder = (sortOrder.lng === 'asc') ? 'desc' : 'asc';
+            return {
+                sort: column.dataIndex,
+                sortOrder: {
+                    lng: newSortOrder
+                }
+            }
+        case 'TD':
+            newSortOrder = (sortOrder.td === 'asc') ? 'desc' : 'asc';
+            return {
+                sort: column.dataIndex,
+                sortOrder: {
+                    td: newSortOrder
+                }
+            }
+    }
 }

@@ -19,9 +19,14 @@ module.exports.getPaginatedPlayers = ({ filteredPlayers = [], page }) => {
  * 
  * @param sort : Name of the column used to sort the table
  */
-module.exports.getSortedPlayers = ({ sort }) => {
+module.exports.getSortedPlayers = ({ sort, sortOrder = 'asc' }) => {
     const _players = Hoek.clone(PLAYERS);
-    return (sort) ? _players.sort((a, b) => (getNumber(a[sort]) > getNumber(b[sort])) ? 1 : -1) : _players;
+
+    if(sortOrder === 'asc') {
+        return (sort) ? _players.sort((a, b) => (getNumber(a[sort]) > getNumber(b[sort])) ? 1 : -1) : _players;
+    }else {
+        return (sort) ? _players.sort((a, b) => (getNumber(a[sort]) > getNumber(b[sort])) ? -1 : 1) : _players;
+    }
 }
 
 /**
