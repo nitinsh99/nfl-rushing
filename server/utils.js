@@ -1,10 +1,8 @@
 module.exports.getNumber = (num) => {
 
-    if(Number.isNaN(num)) {
-        replace(/\D/g,'')
-        return parseInt(num.trim().replace(/\D/g,''),10)
-
-    }else {
+    if(typeof num === 'number') {
         return num;
     }
+    const _num = parseInt(num.replace(/\D/g,''),10);
+    return (num.startsWith('-') ? -1*_num : _num);  
 } 
